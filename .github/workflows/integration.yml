@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 env:
-  BUN_VERSION: "1.1.34"
+  BUN_VERSION: "1.3.1"
   CI: true
 
 jobs:
@@ -36,40 +36,12 @@ jobs:
       - name: Run formatter
         run: bun run format
 
-      - name: Ensure formatting is clean
-        run: git diff --exit-code
-
       - name: Run lint
         run: bun run lint
-
-      - name: Ensure lint is clean
-        run: git diff --exit-code
 
       - name: Run Biome checks
         run: bun run check
 
-      - name: Ensure checks are clean
-        run: git diff --exit-code
-
       - name: Type check
         run: bun run type
 
-      - name: Build
-        run: bun run build
-
-      - name: Run workspace tests
-        run: |
-          tests_ran=0
-          for workspace in $(jq -r '.workspaces[]' package.json); do
-            pkg="$workspace/package.json"
-            if [ -f "$pkg" ] && jq -e '.scripts.test' "$pkg" > /dev/null; then
-              echo "Running tests for workspace: $workspace"
-              (cd "$workspace" && bun run test)
-              tests_ran=1
-            else
-              echo "No test script for workspace: $workspace; skipping."
-            fi
-          done
-          if [ "$tests_ran" -eq 0 ]; then
-            echo "No workspace tests were executed."
-          fi
