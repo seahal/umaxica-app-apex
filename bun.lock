@@ -4,14 +4,14 @@
     "": {
       "name": "umaxica-app-apex",
       "dependencies": {
-        "hono": "^4.10.4",
+        "hono": "latest",
       },
       "devDependencies": {
-        "@biomejs/biome": "2.3.3",
-        "@cloudflare/vite-plugin": "^1.13.18",
-        "vite": "^7.1.12",
-        "vite-ssr-components": "^0.5.1",
-        "wrangler": "^4.45.3",
+        "@biomejs/biome": "latest",
+        "@cloudflare/vite-plugin": "latest",
+        "vite": "latest",
+        "vite-ssr-components": "latest",
+        "wrangler": "latest",
       },
     },
     "app": {
