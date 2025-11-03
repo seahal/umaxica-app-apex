@@ -1,15 +1,15 @@
 {
-  "name": "umaxica-app-apex-staging-app",
-  "type": "module",
-  "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
-  },
-  "dependencies": {
-    "hono": "^4.10.4"
-  },
-  "devDependencies": {
-    "wrangler": "^4.4.0"
-  }
+	"name": "umaxica-app-apex-staging-app",
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy --minify",
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
+	},
+	"dependencies": {
+		"hono": "^4.10.4"
+	},
+	"devDependencies": {
+		"wrangler": "^4.4.0"
+	}
 }
