@@ -21,7 +21,7 @@ This document defines the test strategy, scope, environments, cases, and accepta
 ## 2. Test Scope
 
 ### 2.1 In Scope
-- Edge routing/redirect logic (Hono on Vercel/Cloudflare Workers)
+- Edge routing/redirect logic (Hono on Bun locally, deployed to Vercel/Cloudflare Workers)
 - Static asset delivery (`robots.txt`, `sitemap.xml`, `about.html`, etc.)
 - Localization parameters (`lx`, `ri`, optional `tz`)
 - Domain-specific behaviors and feature flags per TLD
@@ -54,8 +54,10 @@ This document defines the test strategy, scope, environments, cases, and accepta
 
 - **Automation-first**: Playwright (integration/e2e), Bun Test (unit), Biome (static), Lighthouse CI (web perf), k6 (redirect throughput), curl (smoke).
 - **Domain-parameterized**: Single codebase of tests runs with domain matrix (.com/.org/.app/.dev/.net) and locale sets.
+- **Canonicalization coverage**: Dedicated regression checks assert that `www.` hosts normalize to apex domains and that trusted `ri` parameters produce regional subdomains with unsupported query keys stripped.
 - **Shift-left security**: Header assertions in all smoke tests.
 - **Observability-led**: Validate OpenTelemetry events emission for key flows.
+- **Deferred enrichment**: Cookie/JWT and geolocation heuristics are tracked as pending suites for a future phase.
 
 ---
 
@@ -67,6 +69,7 @@ This document defines the test strategy, scope, environments, cases, and accepta
 | Production | Live verification | `https://umaxica.[com|org|app|dev|net]`, `https://www.umaxica.[com|org|app|dev|net]` |
 
 **Tools/Versions**: Bun ≥ 1.3, Node 22 (if needed), Playwright latest, Biome latest, Lighthouse CI, k6.  
+**Provisioning**: Terraform codifies staging and production edge resources so environment configuration stays reproducible.  
 **Data/Config**: Use env-driven domain list; KV seeded with redirect rules from DDS.
 
 ---
@@ -75,11 +78,11 @@ This document defines the test strategy, scope, environments, cases, and accepta
 
 | Aspect | .com | .org | .app | .dev | .net |
 |---|---|---|---|---|---|
-| Redirect base | `app.umaxica.com` | `org.umaxica.org` | Self-hosted SPA | staging app | Fastly/API passthrough |
+| Redirect base | `app.umaxica.com` | `org.umaxica.org` | Self-hosted app | staging app | Fastly/API passthrough |
 | Static assets | robots/sitemap/about | policy/contact | manifest | staging-status | cache-info |
 | Cache TTL | 1d | 6h | 2h | 5m | 1h |
 | Telemetry tag | corp | org | app | dev | net |
-| Flags | CSP_STRICT | HTTPS_ONLY | EDGE_REACT_ROUTER | DEBUG_MODE | FASTLY_RELAY |
+| Flags | CSP_STRICT | HTTPS_ONLY | EDGE_HONO_SSR | DEBUG_MODE | FASTLY_RELAY |
 
 All test cases include **domain tags** so they can be filtered per TLD.
 
@@ -98,9 +101,14 @@ All test cases include **domain tags** so they can be filtered per TLD.
 - **Exp**: 301/302 to `https://app.umaxica.com/` (no locale), Cache-Control present per TTL  
 - **Tags**: domain:com, functional
 
+**TC-RD-001b WWW canonicalization (all)**  
+- **Steps**: GET `https://www.umaxica.[tld]` for each apex domain  
+- **Exp**: 301 to `https://umaxica.[tld]` with HSTS header present and no additional query parameters  
+- **Tags**: domain:all, functional
+
 **TC-RD-002 Locale redirect (.com)**  
 - **Steps**: GET `https://umaxica.com/?lx=ja&ri=jp`  
-- **Exp**: 302 to `https://app.umaxica.com/?lx=ja&ri=jp`  
+- **Exp**: 302 to `https://jp.umaxica.com/?lx=ja&ri=jp`  
 - **Tags**: domain:com, l10n, functional
 
 **TC-RD-003 Invalid locale fallback (all)**  
@@ -108,14 +116,19 @@ All test cases include **domain tags** so they can be filtered per TLD.
 - **Exp**: 400 or fallback to default (`ja/jp`) per DDS policy; event logged  
 - **Tags**: domain:all, l10n, error
 
+**TC-RD-003b Unsupported params stripped (all)**  
+- **Steps**: GET `/?ri=jp&foo=bar&tracking=1`  
+- **Exp**: 302 to `https://jp.umaxica.[tld]/?ri=jp` with unsupported params removed; telemetry notes dropped keys  
+- **Tags**: domain:all, functional
+
 **TC-RD-004 Staging mapping (.dev)**  
 - **Steps**: GET `https://umaxica.dev/?lx=en&ri=us`  
 - **Exp**: Redirect to **staging app** endpoint; `X-Debug-Locale: en-us` header present  
 - **Tags**: domain:dev, functional, debug
 
-**TC-RD-005 SPA handling (.app)**  
-- **Steps**: GET `https://umaxica.app/routes/settings`  
-- **Exp**: Served by edge (React Router); status 200; no extra redirect  
+**TC-RD-005 SPA handling (.app)**
+- **Steps**: GET `https://umaxica.app/routes/settings`
+- **Exp**: Served by edge (Hono); status 200; no extra redirect
 - **Tags**: domain:app, functional
 
 **TC-RD-006 CDN relay (.net)**  
@@ -124,11 +137,20 @@ All test cases include **domain tags** so they can be filtered per TLD.
 - **Exp**: Passthrough 200; `X-Relay: fastly` header  
 - **Tags**: domain:net, functional
 
+**TC-RD-007 Diagnostics bypass redirect (all)**  
+- **Steps**: GET `/health`, `/v1/health`, `/trigger-400`, `/trigger-500`  
+- **Exp**: Respective 200/400/500 responses rendered locally (JSON for health, HTML for errors); no Location header  
+- **Tags**: domain:all, functional, ops
+
 ### 7.2 Static Assets
 
 **TC-ST-101 robots (.com)**  
 - GET `/robots.txt` → 200, content matches corporate rules, cache TTL = 1d, `content-type: text/plain`  
 - Tags: domain:com, static
+
+**TC-ST-100 favicon (all)**  
+- GET `/favicon.ico` → 200, binary payload matches brand checksum, cache TTL per domain policy  
+- Tags: domain:all, static
 
 **TC-ST-102 policy (.org)**  
 - GET `/policy.html` → 200, HTML title includes “Policy”, HTTP caching 6h  
@@ -160,10 +182,10 @@ All test cases include **domain tags** so they can be filtered per TLD.
 
 ### 7.4 Performance (NFR)
 
-**TC-PF-301 Lighthouse score (key pages)**  
-- Run Lighthouse CI on:  
-  - `.com` root, `.app` SPA route  
-- Exp: Performance score ≥ 90; LCP < 1.0s  
+**TC-PF-301 Lighthouse score (key pages)**
+- Run Lighthouse CI on:
+  - `.com` root, `.app` routes
+- Exp: Performance score ≥ 90; LCP < 1.0s (Hono edge responses only, excludes downstream Rails)
 - Tags: perf, domain:com/app
 
 **TC-PF-302 Redirect latency**  
@@ -197,7 +219,7 @@ All test cases include **domain tags** so they can be filtered per TLD.
 ### 7.6 Localization
 
 **TC-LZ-501 Param normalization**  
-- `/?ri=JP&lx=JA` → normalized to `ri=jp&lx=ja` in redirect target  
+- `/?ri=JP&lx=JA&tracking=true` → normalized to `ri=jp&lx=ja` in redirect target with unsupported params removed  
 - Tags: l10n, domain:all
 
 **TC-LZ-502 Default locale**  
@@ -217,6 +239,11 @@ All test cases include **domain tags** so they can be filtered per TLD.
 **TC-OB-602 Error event**  
 - Trigger 500 → `event=error` with `code=500`  
 - Tags: obs, domain:any
+
+### 7.8 Pending (Future Phase)
+- Cookie/JWT-based routing inference when `ri` is absent (awaiting signed-cookie feature).  
+- Geolocation and user-agent heuristic redirects for anonymous traffic (awaiting edge enrichment).  
+- Additional monitoring assertions once enrichment is released.
 
 ---
 
@@ -255,4 +282,3 @@ All test cases include **domain tags** so they can be filtered per TLD.
 ```bash
 bunx playwright test --grep "@domain=com"
 bunx playwright test --project=webkit  # Safari-like
-
