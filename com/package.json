@@ -1,5 +1,5 @@
 {
-  "name": "net",
+  "name": "umaxica-app-apex-staging-com",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
