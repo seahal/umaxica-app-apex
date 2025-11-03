@@ -1,0 +1,65 @@
+{
+	"name": "umaxica-app-apex-vscode",
+	"dockerComposeFile": ["../compose.yml", "./compose.override.yml"],
+	"service": "core",
+	"remoteUser": "portal",
+	"workspaceFolder": "/home/portal/workspace",
+
+	"runServices": ["core"],
+	"overrideCommand": false,
+
+	"portsAttributes": {
+		"5070": {
+			"label": "Dev Domain (dev)",
+			"onAutoForward": "notify"
+		},
+		"5071": {
+			"label": "App Domain (app)",
+			"onAutoForward": "notify"
+		},
+		"5072": {
+			"label": "Com Domain (com)",
+			"onAutoForward": "notify"
+		},
+		"5073": {
+			"label": "Org Domain (org)",
+			"onAutoForward": "notify"
+		},
+		"5074": {
+			"label": "Net Domain (net)",
+			"onAutoForward": "notify"
+		}
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"oven.bun-vscode",
+				"biomejs.biome",
+				"openai.chatgpt",
+				"anthropic.claude-code",
+				"bradlc.vscode-tailwindcss",
+				"-dbaeumer.vscode-eslint",
+				"github.vscode-github-actions",
+				"ms-azuretools.vscode-containers",
+				"GitHub.codespaces",
+				"ms-vscode-remote.remote-containers"
+			],
+			"settings": {
+				"editor.defaultFormatter": "biomejs.biome",
+				"editor.formatOnSave": true,
+				"files.eol": "\n",
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "bash",
+						"icon": "terminal-bash"
+					}
+				}
+			}
+		}
+	},
+
+	"features": {},
+	"containerEnv": {}
+}
