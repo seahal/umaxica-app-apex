@@ -1,19 +1,11 @@
 {
-	"name": "umaxica-app-apex-dev",
-	"type": "module",
-	"scripts": {
-		"test": "bun test"
-	},
-	"dependencies": {
-		"hono": "^4.10.4"
-	},
-	"devDependencies": {
-		"@types/node": "^20.11.17",
-		"tsx": "^4.7.1",
-		"typescript": "^5.8.3",
-		"@types/bun": "latest"
-	},
-	"version": "build",
-	"module": "src/index.ts",
-	"private": true
+  "name": "hono",
+  "type": "module",
+  "dependencies": {
+    "hono": "^4.8.9"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "typescript": "^5.8.3"
+  }
 }
