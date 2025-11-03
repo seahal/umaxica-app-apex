@@ -38,7 +38,6 @@ umaxica-app-apex/           (monorepo root)
 ├── app/                    (umaxica.app workspace)
 │   ├── src/index.tsx       (Hono application entry)
 │   ├── src/renderer.tsx    (JSX renderer for SSR)
-│   ├── vite.config.ts      (Vite bundler config)
 │   ├── wrangler.jsonc      (Cloudflare Workers config)
 │   ├── test/               (domain-specific tests)
 │   └── package.json        (workspace dependencies)
@@ -59,9 +58,9 @@ umaxica-app-apex/           (monorepo root)
 ### 2.2 Common Platform
 - **Framework:** Hono 4.10+ (TypeScript/TSX)
 - **Package Manager:** Bun 1.3+ (manages workspaces)
-- **Build Tool:** Vite 6+ with `@cloudflare/vite-plugin` for edge bundling
+- **Build & Dev Tooling:** Wrangler CLI (esbuild-based bundling) orchestrated via Bun scripts (no Vite dependency)
 - **Runtime:** Cloudflare Workers (primary deployment target)
-- **Rendering:** Hono JSX Renderer + `vite-ssr-components` (for .app, .com, .org, .net)
+- **Rendering:** Hono JSX Renderer (for .app, .com, .org, .net)
 - **Testing:** Bun Test (unit tests per workspace)
 - **Linting/Formatting:** Biome (shared configuration)
 - **Deployment:** Wrangler CLI (per workspace)
@@ -112,57 +111,32 @@ export default app;
 
 #### 3.1.2 JSX Renderer
 - **Location:** `{workspace}/src/renderer.tsx`
-- **Technology:** `hono/jsx-renderer` + `vite-ssr-components`
+- **Technology:** `hono/jsx-renderer`
 - **Responsibilities:**
   - Define HTML document structure
-  - Inject Vite client for HMR during development
-  - Load CSS stylesheets
-  - Render JSX children into `<body>`
+  - Provide shared metadata, styles, and layout wrappers
+  - Render JSX children into `<body>` for edge responses
 
 **Example (app/src/renderer.tsx):**
 ```typescript
 import { jsxRenderer } from "hono/jsx-renderer";
-import { Link, ViteClient } from "vite-ssr-components/hono";
 
-export const renderer = jsxRenderer(({ children }) => {
-  return (
-    <html>
-      <head>
-        <ViteClient />
-        <Link href="/src/style.css" rel="stylesheet" />
-      </head>
-      <body>{children}</body>
-    </html>
-  );
-});
+export const renderer = jsxRenderer(({ children }) => (
+  <html>
+    <head>
+      <meta charSet="utf-8" />
+      <link rel="stylesheet" href="/public/app.css" />
+    </head>
+    <body>{children}</body>
+  </html>
+));
 ```
 
-#### 3.1.3 Vite Configuration
-- **Location:** `{workspace}/vite.config.ts`
-- **Plugins:**
-  - `@cloudflare/vite-plugin`: Bundles Hono app for Cloudflare Workers
-  - `vite-ssr-components/plugin`: Enables SSR with JSX components
-- **Dev Server:**
-  - Host: `0.0.0.0` (accessible in Docker container)
-  - Port: Unique per workspace (e.g., 5071 for `app/`)
-  - Polling: Enabled for Docker volume compatibility
-
-**Example (app/vite.config.ts):**
-```typescript
-import { cloudflare } from "@cloudflare/vite-plugin";
-import { defineConfig } from "vite";
-import ssrPlugin from "vite-ssr-components/plugin";
-
-export default defineConfig({
-  plugins: [cloudflare(), ssrPlugin()],
-  server: {
-    host: true,
-    port: 5071,
-    strictPort: true,
-    watch: { usePolling: true },
-  },
-});
-```
+#### 3.1.3 Dev & Build Tooling (No Vite)
+- **Commands:** Defined per workspace in `package.json`.
+- **Local development:** `bunx wrangler dev --port <port>` runs the Cloudflare Worker locally with live reload support.
+- **Bundling:** Wrangler's esbuild-based pipeline compiles TypeScript and JSX into deployable worker scripts; no Vite configuration files are required.
+- **Edge parity:** `bunx wrangler dev --remote` provides integration testing against Cloudflare's edge environment when needed.
 
 #### 3.1.4 Wrangler Configuration
 - **Location:** `{workspace}/wrangler.jsonc`
@@ -185,17 +159,15 @@ export default defineConfig({
 #### 3.1.5 Workspace Package Configuration
 - **Location:** `{workspace}/package.json`
 - **Scripts:**
-  - `dev`: Run Vite dev server with HMR
-  - `build`: Build for production (Vite → Cloudflare Workers bundle)
+  - `dev`: Start Wrangler dev server (`bunx wrangler dev --port <port>`)
+  - `build`: Create a deployable worker bundle via `bunx wrangler deploy --dry-run`
   - `test`: Run Bun tests in workspace
-  - `preview`: Build and preview production bundle locally
-  - `deploy`: Build and deploy to Cloudflare Workers via Wrangler
+  - `preview`: Preview the worker against Cloudflare edge (`bunx wrangler dev --remote`)
+  - `deploy`: Deploy to Cloudflare Workers via Wrangler
 - **Dependencies:**
   - `hono`: Web framework
-  - `@cloudflare/vite-plugin`: Cloudflare Workers bundler
-  - `vite`: Build tool
-  - `vite-ssr-components`: SSR utilities
   - `wrangler`: Cloudflare Workers CLI
+  - `@cloudflare/workers-types`: Optional type definitions for Cloudflare runtime
 
 ---
 
@@ -229,8 +201,8 @@ app.get("/", (c) => {
 export default app;
 ```
 
-**Note:** The `dev/` workspace currently lacks:
-- Vite configuration (may use alternative bundler or direct execution)
+**Note:** The `dev/` workspace currently omits:
+- Custom bundler configuration (relies on Wrangler defaults or direct execution)
 - Wrangler configuration (may deploy to Vercel instead)
 - JSX rendering capabilities
 
@@ -277,7 +249,7 @@ The following workflow is **planned for the next phase**:
 - **Key Settings:**
   - `jsx: "react-jsx"`: Enable JSX transform for Hono
   - `module: "Preserve"`: Preserve ESM module syntax
-  - `moduleResolution: "bundler"`: Optimize for Vite bundler
+  - `moduleResolution: "node"`: Align resolution with Bun/Wrangler pipeline
   - `strict: true`: Enable all strict type checks
 
 #### 5.1.2 Biome Configuration
@@ -304,7 +276,7 @@ The following workflow is **planned for the next phase**:
 Each workspace deploys **independently** to Cloudflare Workers:
 
 1. Developer runs `bun run deploy` in workspace directory
-2. Vite builds the application bundle
+2. Wrangler compiles the application bundle using its built-in esbuild pipeline
 3. Wrangler deploys the bundle to Cloudflare Workers
 4. Domain-specific worker is updated (e.g., `my-app` for `app/`)
 
@@ -312,7 +284,7 @@ Each workspace deploys **independently** to Cloudflare Workers:
 ```
 Developer
   └─> bun run deploy (in workspace)
-       └─> vite build
+       └─> wrangler deploy --dry-run
             └─> Bundle TypeScript + JSX → JavaScript
                  └─> wrangler deploy
                       └─> Upload to Cloudflare Workers
@@ -458,7 +430,7 @@ bun test --coverage
 1. Start Docker Compose environment: `docker compose up -d`
 2. Attach to container: `docker exec -it edge-core-1 bash`
 3. Navigate to workspace: `cd app/`
-4. Start dev server: `bun run dev`
+4. Start dev server: `bunx wrangler dev --port 5071 --local`
 5. Access at `http://localhost:5071`
 
 ### 11.2 Development Ports (Docker)
@@ -471,9 +443,9 @@ bun test --coverage
 | `dev/` | 5075 | umaxica.dev development |
 
 ### 11.3 Hot Module Replacement (HMR)
-- Vite provides HMR for all JSX workspaces
-- File changes trigger instant browser updates
-- No need to restart dev server
+- Wrangler's dev server recompiles workers on file change (JSX + TypeScript)
+- Browser will refresh automatically when Cloudflare worker reloads
+- No Vite middleware is required; relies entirely on Hono runtime output
 
 ---
 
@@ -548,11 +520,9 @@ umaxica-app-apex/
 | Package | Version | Purpose |
 |---------|---------|---------|
 | hono | 4.10+ | Web framework |
-| vite | 6.3+ | Build tool |
-| @cloudflare/vite-plugin | 1.2+ | Cloudflare Workers bundler |
-| vite-ssr-components | 0.5+ | SSR utilities for Hono JSX |
-| wrangler | 4.17+ | Cloudflare Workers CLI |
+| wrangler | 4.17+ | Cloudflare Workers CLI & bundler |
 | bun | 1.3+ | Package manager & test runner |
+| @cloudflare/workers-types | 4.2024+ | Cloudflare runtime type definitions |
 | @biomejs/biome | 2.3+ | Linter & formatter |
 
 ---

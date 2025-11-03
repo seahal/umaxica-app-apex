@@ -87,8 +87,8 @@ Each workspace is an independent Hono application with the following components:
 | Component | Location | Technology | Description |
 |------------|----------|-------------|-------------|
 | **Application Entry Point** | `{workspace}/src/index.tsx` or `.ts` | Hono | Main application logic, route definitions |
-| **JSX Renderer** (app, com, org, net only) | `{workspace}/src/renderer.tsx` | Hono JSX Renderer + vite-ssr-components | Server-side rendering of JSX components |
-| **Build Configuration** | `{workspace}/vite.config.ts` | Vite + @cloudflare/vite-plugin | Bundles application for edge deployment |
+| **JSX Renderer** (app, com, org, net only) | `{workspace}/src/renderer.tsx` | Hono JSX Renderer | Server-side rendering of JSX components |
+| **Runtime Scripts** | `{workspace}/package.json` | Bun scripts + Wrangler CLI | Defines dev, build, and deploy commands without Vite |
 | **Deployment Configuration** | `{workspace}/wrangler.jsonc` | Wrangler CLI | Cloudflare Workers deployment settings |
 | **Tests** | `{workspace}/test/` | Bun Test | Unit and integration tests |
 
@@ -170,7 +170,7 @@ Each workspace is an independent Hono application with the following components:
 
 ### 9.1 Build and Deployment Flow
 1. Code is pushed to the GitHub main branch.
-2. GitHub Actions (CI) executes Bun-based tests, Biome checks, and Vite builds the edge bundles for the Hono application.
+2. GitHub Actions (CI) executes Bun-based tests, Biome checks, and uses Wrangler's native bundler to produce deployable Hono workers (no Vite step).
 3. A successful build triggers both Vercel and Cloudflare deployment hooks, publishing artifacts to their respective edge runtimes.
 4. Deployment is automatically verified via `/health` and `/v1/health` checks and monitored with OpenTelemetry events.  
 
@@ -186,7 +186,7 @@ Each workspace is an independent Hono application with the following components:
 - **Why Hono:** Lightweight, edge-optimized framework suitable for stateless redirects and dynamic rendering.
 - **Why Vercel + Cloudflare Workers:** Combines global caching, CDN scalability, and programmable edge behavior.
 - **Why Bun:** Fast JavaScript/TypeScript package manager with native testing support.
-- **Why Vite:** Modern, fast build tool optimized for edge runtime bundling.  
+- **Why Hono-only tooling:** Keeps edge handlers lean by relying on Wrangler's default bundler and Bun-managed scripts, reducing surface area and operational overhead.  
 
 ---
 

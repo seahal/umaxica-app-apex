@@ -46,7 +46,7 @@
   - Provide a unified multilingual regional portal across five domains
   - Ensure high availability and global scalability
   - Integrate seamlessly with Vercel and Cloudflare Workers
-  - Utilize **Bun** for package management and **Vite** as the build tool
+  - Utilize **Bun** for package management while relying solely on **Hono** runtime tooling for development and edge execution (no additional bundler)
   - Enable independent deployment and customization per domain
 
 ---
@@ -88,7 +88,7 @@
 ---
 
 ## 6. Constraints and Dependencies
-- **Technology stack:** Bun 1.3+ (package manager), Vite 7+ (build tool), Hono 4+ (framework)
+- **Technology stack:** Bun 1.3+ (package manager/runtime), Hono 4+ (framework and tooling)
 - **Infrastructure:** Vercel and Cloudflare Workers
 - **Provisioning:** Environment configuration and infrastructure resources are defined and managed via Terraform
 - **Configuration:** Environment variables (per workspace via Wrangler or Vercel):
