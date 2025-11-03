@@ -13,12 +13,6 @@ const welcomeStrings = [
 	"2 Vercel, visit https://vercel.com/docs/frameworks/backend/hono",
 ];
 
-type AssetEnv = {
-	ASSETS?: {
-		fetch: (request: Request) => Promise<Response>;
-	};
-};
-
 const staticPaths = new Set(["/robots.txt", "/sitemap.xml", "/favicon.ico"]);
 
 app.use("*", async (c, next) => {
