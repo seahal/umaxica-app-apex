@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "umaxica-app-apex-net",
+  "name": "umaxica-app-apex-staging-net",
   "main": "src/index.ts",
   "compatibility_date": "2025-11-03",
   // "compatibility_flags": [
