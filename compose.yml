@@ -1,4 +1,4 @@
-name: "edge"
+name: "apex"
 services:
   core:
     build:
