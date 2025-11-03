@@ -38,5 +38,7 @@
 	"observability": {
 		"enabled": true,
 		"head_sampling_rate": 1
-	}
+	},
+	"placement": { "mode": "smart" },
+	"assets": { "directory": "./public/", "binding": "ASSETS" }
 }
