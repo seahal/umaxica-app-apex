@@ -24,11 +24,11 @@ services:
         target: /home/portal/.bun
         volume:
           nocopy: true
-    ports:
-      - '5170:5170'
-      - '5171:5171'
-      - '5172:5172'
-      - '5173:5173'
+    expose:
+      - '5170'
+      - '5171'
+      - '5172'
+      - '5173'
     command: sleep infinity
     tty: true
     stdin_open: true

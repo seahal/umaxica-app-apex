@@ -1,5 +1,5 @@
 {
-  "name": "umaxica-app-apex",
+  "name": "umaxica-app-apex-org",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,12 +16,5 @@
     "vite": "^6.3.5",
     "vite-ssr-components": "^0.5.1",
     "wrangler": "^4.17.0"
-  },     
-  "private": true,
-        "workspaces": [
-                "app",
-                "com",
-                "dev",
-                "org","net"
-        ]
+  }
 }

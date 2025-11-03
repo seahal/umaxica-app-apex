@@ -1,0 +1,6 @@
+services:
+  core:
+    # Rely on VS Code auto-forwarding; use compose.host-ports.yml for fixed host bindings.
+    environment:
+      - DEVCONTAINER=1
+    restart: unless-stopped
