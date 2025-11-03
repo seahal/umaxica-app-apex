@@ -33,43 +33,51 @@
 ---
 
 ## 3. System Overview
-- **Architecture:**  
-  A Hono-based application deployed on both Vercel and Cloudflare Workers runtime environments.
+- **Architecture:**
+  A **monorepo** containing five independent Hono-based applications (one per domain), deployed to Cloudflare Workers and Vercel runtime environments. Managed using **Bun workspaces** for unified dependency management while maintaining per-domain autonomy.
 
-- **User groups:**  
+- **User groups:**
   No administrative users; the portal serves only end users as a public entry point.
 
-- **Supported platforms:**  
+- **Supported platforms:**
   Modern browsers (Chrome, Firefox, Safari, Edge).
 
-- **Primary goals:**  
-  - Provide a unified multilingual regional portal  
-  - Ensure high availability and global scalability  
-  - Integrate seamlessly with Vercel and Cloudflare Workers  
-  - Utilize **Bun** as the primary runtime and build tool
+- **Primary goals:**
+  - Provide a unified multilingual regional portal across five domains
+  - Ensure high availability and global scalability
+  - Integrate seamlessly with Vercel and Cloudflare Workers
+  - Utilize **Bun** for package management and **Vite** as the build tool
+  - Enable independent deployment and customization per domain
 
 ---
 
 ## 4. Functional Requirements
 ### 4.1 Core Features
-- Support for user registration and authentication (Passkey / JWT-based)  
-- Redirect users to localized URLs handled by **React Router** running on Cloudflare Workers  
-- Serve lightweight static pages such as `robots.txt`, `sitemap.xml`, and `about.html`
+- Canonicalize inbound apex traffic by stripping any leading `www.` and redirecting back to the naked domain (301/302).  
+- When the query contains a trusted `ri` region code (for example `ri=jp`), redirect to the corresponding regional apex subdomain (`jp.umaxica.[com|org|app|dev]`) while preserving approved parameters; remove unsupported parameters and fall back to the canonical URL when none remain.  
+- Serve dedicated diagnostic responses for `/health`, `/v1/health`, and error pages (400/500) while other routes continue to redirect.
+- Provide required static assets, including `favicon.ico`, `robots.txt`, `sitemap.xml`, and additional brand collateral.
+- Redirect users to localized URLs handled by **Hono** framework running on Cloudflare Workers.
 
 ### 4.2 Administrative Functions
 - No administrative interface is required for this project.
 
 ### 4.3 Integrations
-- **GitHub:** Use GitHub Actions for Continuous Integration (CI)  
-- **Vercel:** Deploy via Vercel’s native Continuous Deployment (CD) pipelines  
-- **Cloudflare:** Deploy as Cloudflare Workers using automated CD processes  
+- **GitHub:** Use GitHub Actions for Continuous Integration (CI)
+- **Vercel:** Deploy via Vercel's native Continuous Deployment (CD) pipelines
+- **Cloudflare:** Deploy as Cloudflare Workers using automated CD processes
+
+### 4.4 Future Phase: Authentication & Routing Enrichment
+- **JWT validation:** Signed JWT cookies will be validated (but not issued) to enable personalized routing in a future phase
+- **Geolocation & User-Agent:** Heuristic-based routing using geolocation and user-agent analysis will be introduced in a subsequent phase
+- **Current phase:** No authentication or user registration is implemented; all routing is based on explicit query parameters only
 
 ---
 
 ## 5. Non-Functional Requirements
 | Category | Requirement |
 |-----------|-------------|
-| **Performance** | Page load time under 1 second (LCP < 1.0 s) |
+| **Performance** | Hono edge response time under 1 second (LCP < 1.0 s); does not include downstream Rails application performance |
 | **Reliability** | System uptime ≥ 98 % |
 | **Scalability** | Multi-region deployment capability |
 | **Security** | Enforce strict CSP headers and HTTPS-only traffic |
@@ -80,17 +88,26 @@
 ---
 
 ## 6. Constraints and Dependencies
-- **Technology stack:** Bun 1.3.1  
-- **Infrastructure:** Vercel and Cloudflare Workers  
-- **Configuration:** Environment variables follow the naming scheme:  
-  `BRAND_NAME`, `EDGE_CORPORATE_URL`, `EDGE_SERVICE_URL`, `EDGE_ORGANIZATION_URL`  
-- **External dependencies:**  
-  - Cloudflare API v4  
-  - Vercel Deploy Hooks  
-  - GitHub Actions  
-- **Operational constraints:**  
-  - Edge-runtime memory and execution-time limits imposed by Cloudflare Workers and Vercel  
-  - Static-file size limits per deployment target  
+- **Technology stack:** Bun 1.3+ (package manager), Vite 7+ (build tool), Hono 4+ (framework)
+- **Infrastructure:** Vercel and Cloudflare Workers
+- **Provisioning:** Environment configuration and infrastructure resources are defined and managed via Terraform
+- **Configuration:** Environment variables (per workspace via Wrangler or Vercel):
+  - `BRAND_NAME`: Brand display name (e.g., `"Umaxica"`)
+  - `EDGE_CORPORATE_URL`: Rails backend for corporate domain with regional subdomain (e.g., `"https://jp.umaxica.com"` or `"https://us.umaxica.com"`)
+  - `EDGE_SERVICE_URL`: Rails backend for service portal with regional subdomain (e.g., `"https://jp.umaxica.app"` or `"https://us.umaxica.app"`)
+  - `EDGE_ORGANIZATION_URL`: Rails backend for organization portal with regional subdomain (e.g., `"https://jp.umaxica.org"` or `"https://us.umaxica.org"`)
+  - `EDGE_STATUS_URL`: Rails backend for status/development with regional subdomain (e.g., `"https://us.umaxica.dev"` or `"https://jp.umaxica.dev"`)
+  - `DEFAULT_LOCALE`: Default locale code (e.g., `"ja"`)
+  - `DEFAULT_REGION`: Default region code (e.g., `"jp"`)
+- **External dependencies:**
+  - Cloudflare API v4
+  - Vercel Deploy Hooks
+  - GitHub Actions
+  - Rails backend APIs (for redirect targets)
+- **Operational constraints:**
+  - Edge-runtime memory and execution-time limits imposed by Cloudflare Workers and Vercel
+  - Static-file size limits per deployment target
+  - Monorepo workspace isolation (no cross-workspace imports)  
 
 ---
 
@@ -98,10 +115,13 @@
 | Item | Condition |
 |------|------------|
 | **Core navigation** | All registered apex and `www` URLs respond successfully |
-| **Localization** | Query parameters `?lx=ja&ri=jp` render correctly localized content |
-| **Authentication** | Authentication is currently not required |
-| **Performance** | Lighthouse performance score ≥ 90 |
+| **Canonical routing** | `www.` URLs redirect to the apex domain, unsupported params removed |
+| **Localization** | Query parameters `?lx=ja&ri=jp` emit the correct regional subdomain |
+| **Authentication** | Not implemented in current phase; JWT validation deferred to future phase |
+| **Performance** | Lighthouse performance score ≥ 90 (Hono edge responses only) |
 | **Deployment** | GitHub Actions (CI) and Vercel / Cloudflare Workers (CD) pipelines execute automatically and complete successfully |
+| **Static assets** | `favicon.ico`, `robots.txt`, and `sitemap.xml` serve branded content per domain |
+| **Health endpoints** | `/health` and `/v1/health` respond with diagnostic payloads (200) |
 
 ---
 
@@ -117,4 +137,3 @@
 > This document serves as an internal Software Requirements Specification (SRS) for the Umaxica in-house development team.  
 > It is **not** intended for vendor solicitation or external distribution.  
 > All requirements must be reviewed and approved within the internal development workflow.
-
