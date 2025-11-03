@@ -6,22 +6,22 @@ services:
       args:
         - DOCKER_UID=${UID:-1000}
         - DOCKER_GID=${GID:-1000}
-        - DOCKER_USER=portal
-        - DOCKER_GROUP=portal
-    working_dir: /home/portal/workspace
+        - DOCKER_USER=apex
+        - DOCKER_GROUP=group
+    working_dir: /home/apex/workspace
     volumes:
       - type: bind
         source: .
-        target: /home/portal/workspace
+        target: /home/apex/workspace
         consistency: cached
       - type: volume
         source: node-volume
-        target: /home/portal/workspace/node_modules
+        target: /home/apex/workspace/node_modules
         volume:
           nocopy: true
       - type: volume
         source: bun-volume
-        target: /home/portal/.bun
+        target: /home/apex/.bun
         volume:
           nocopy: true
     expose:
@@ -33,7 +33,7 @@ services:
     tty: true
     stdin_open: true
     init: true
-    user: portal:portal
+    user: apex:group
     environment:
       - NODE_OPTIONS=--max-old-space-size=4096
     restart: unless-stopped
@@ -42,4 +42,3 @@ volumes:
     driver: local
   node-volume:
     driver: local
-  

@@ -2,8 +2,8 @@
 	"name": "umaxica-app-apex-vscode",
 	"dockerComposeFile": ["../compose.yml", "./compose.override.yml"],
 	"service": "core",
-	"remoteUser": "portal",
-	"workspaceFolder": "/home/portal/workspace",
+	"remoteUser": "apex",
+	"workspaceFolder": "/home/apex/workspace",
 
 	"runServices": ["core"],
 	"overrideCommand": false,
