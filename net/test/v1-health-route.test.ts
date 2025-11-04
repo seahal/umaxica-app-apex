@@ -1,21 +1,19 @@
 import { describe, expect, it } from "bun:test";
 import { requestFromNetApp } from "./utils/request";
 
-describe("GET /", () => {
-	it("returns the NET welcome HTML document", async () => {
-		const response = await requestFromNetApp("/");
+describe("GET /v1/health", () => {
+	it("returns a JSON health check response", async () => {
+		const response = await requestFromNetApp("/v1/health");
 
 		expect(response.status).toBe(200);
-		expect(response.headers.get("content-type")).toContain("text/html");
+		expect(response.headers.get("content-type")).toContain("application/json");
 
-		const body = await response.text();
-		expect(body).toContain("<title>Welcome - NET</title>");
-		expect(body).toContain("<h1>Umaxica NET Workspace</h1>");
-		expect(body).toContain("Hello 2 Hono! net");
+		const body = await response.json();
+		expect(body).toEqual({ status: "ok" });
 	});
 
-	it("applies security headers to the root response", async () => {
-		const response = await requestFromNetApp("/");
+	it("applies security headers to the v1/health response", async () => {
+		const response = await requestFromNetApp("/v1/health");
 
 		expect(response.headers.get("strict-transport-security")).toContain(
 			"max-age=31536000",

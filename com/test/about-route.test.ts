@@ -1,21 +1,22 @@
 import { describe, expect, it } from "bun:test";
-import { requestFromNetApp } from "./utils/request";
+import { requestFromComApp } from "./utils/request";
 
-describe("GET /", () => {
-	it("returns the NET welcome HTML document", async () => {
-		const response = await requestFromNetApp("/");
+describe("GET /about", () => {
+	it("returns the COM about HTML document with key metadata", async () => {
+		const response = await requestFromComApp("/about");
 
 		expect(response.status).toBe(200);
 		expect(response.headers.get("content-type")).toContain("text/html");
 
 		const body = await response.text();
-		expect(body).toContain("<title>Welcome - NET</title>");
-		expect(body).toContain("<h1>Umaxica NET Workspace</h1>");
-		expect(body).toContain("Hello 2 Hono! net");
+		expect(body).toContain("<title>About - COM</title>");
+		expect(body).toContain("<strong>Service Name:</strong> COM");
+		expect(body).toContain("Umaxica App Status Page - COM Service");
+		expect(body).toContain("<strong>Runtime:</strong> Cloudflare Workers");
 	});
 
-	it("applies security headers to the root response", async () => {
-		const response = await requestFromNetApp("/");
+	it("applies security headers to the about response", async () => {
+		const response = await requestFromComApp("/about");
 
 		expect(response.headers.get("strict-transport-security")).toContain(
 			"max-age=31536000",
