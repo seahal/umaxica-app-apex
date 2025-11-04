@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import {
-	resolveRedirectUrl,
-	getDefaultRedirectUrl,
 	buildRegionErrorPayload,
+	getDefaultRedirectUrl,
+	resolveRedirectUrl,
 } from "../src/pages/root-redirect";
 
 describe("root-redirect utilities", () => {
