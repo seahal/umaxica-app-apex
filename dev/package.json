@@ -1,5 +1,17 @@
 {
 	"name": "umaxica-app-apex-dev",
 	"type": "module",
-	"private": true
+	"private": true,
+	"scripts": {
+		"server": "bun --ip 0.0.0.0 --port 8785",
+		"build": "bun build src/index.ts --outdir=dist --target=node",
+		"dev": "bun run server"
+	},
+	"dependencies": {
+		"hono": "latest"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"vercel": "^48.8.2"
+	}
 }

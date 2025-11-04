@@ -1,11 +1,12 @@
 import { Hono } from "hono";
-import { renderAboutPage } from "./pages/about-page";
-import { renderHealthPage } from "./pages/health-page";
+import { logger } from "hono/logger";
+import { renderAboutPage } from "./pages/about-page.ts";
+import { renderHealthPage } from "./pages/health-page.ts";
 import {
 	buildRegionErrorPayload,
 	getDefaultRedirectUrl,
 	resolveRedirectUrl,
-} from "./pages/root-redirect";
+} from "./pages/root-redirect.ts";
 
 type AssetEnv = {
 	ASSETS?: {
@@ -16,6 +17,7 @@ type AssetEnv = {
 const app = new Hono<{ Bindings: AssetEnv }>();
 
 // Security headers middleware
+app.use(logger());
 app.use("*", async (c, next) => {
 	await next();
 	c.header(
