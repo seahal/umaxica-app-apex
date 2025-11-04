@@ -24,18 +24,14 @@ describe("GET /", () => {
 		const response = await requestFromApp("/?ri=us");
 
 		expect(response.status).toBe(302);
-		expect(response.headers.get("location")).toBe(
-			`https://us.${SITE_URL}/`,
-		);
+		expect(response.headers.get("location")).toBe(`https://us.${SITE_URL}/`);
 	});
 
 	it("normalizes the region parameter to lowercase before checking allowlist", async () => {
 		const response = await requestFromApp("/?ri=US");
 
 		expect(response.status).toBe(302);
-		expect(response.headers.get("location")).toBe(
-			`https://us.${SITE_URL}/`,
-		);
+		expect(response.headers.get("location")).toBe(`https://us.${SITE_URL}/`);
 	});
 
 	it("applies security headers to redirect responses", async () => {
@@ -95,18 +91,14 @@ describe("GET /", () => {
 			const response = await requestFromApp("/?ri=jp");
 
 			expect(response.status).toBe(302);
-			expect(response.headers.get("location")).toBe(
-				`https://jp.${SITE_URL}/`,
-			);
+			expect(response.headers.get("location")).toBe(`https://jp.${SITE_URL}/`);
 		});
 
 		it("only redirects to whitelisted URLs for us region", async () => {
 			const response = await requestFromApp("/?ri=us");
 
 			expect(response.status).toBe(302);
-			expect(response.headers.get("location")).toBe(
-				`https://us.${SITE_URL}/`,
-			);
+			expect(response.headers.get("location")).toBe(`https://us.${SITE_URL}/`);
 		});
 
 		it("rejects empty string as region", async () => {
@@ -137,27 +129,21 @@ describe("GET /", () => {
 			const response = await requestFromApp("/?ri=us&foo=bar");
 
 			expect(response.status).toBe(302);
-			expect(response.headers.get("location")).toBe(
-				`https://us.${SITE_URL}/`,
-			);
+			expect(response.headers.get("location")).toBe(`https://us.${SITE_URL}/`);
 		});
 
 		it("handles case-insensitive region for jp", async () => {
 			const response = await requestFromApp("/?ri=JP");
 
 			expect(response.status).toBe(302);
-			expect(response.headers.get("location")).toBe(
-				`https://jp.${SITE_URL}/`,
-			);
+			expect(response.headers.get("location")).toBe(`https://jp.${SITE_URL}/`);
 		});
 
 		it("handles mixed case region codes", async () => {
 			const response = await requestFromApp("/?ri=Us");
 
 			expect(response.status).toBe(302);
-			expect(response.headers.get("location")).toBe(
-				`https://us.${SITE_URL}/`,
-			);
+			expect(response.headers.get("location")).toBe(`https://us.${SITE_URL}/`);
 		});
 	});
 });

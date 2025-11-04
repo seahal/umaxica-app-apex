@@ -18,9 +18,7 @@ describe("GET /about", () => {
 	it("applies security headers to the about page", async () => {
 		const response = await requestFromApp("/about");
 
-		expect(response.headers.get("permissions-policy")).toContain(
-			"camera=()",
-		);
+		expect(response.headers.get("permissions-policy")).toContain("camera=()");
 		expect(response.headers.get("content-security-policy")).toContain(
 			"default-src 'self'",
 		);

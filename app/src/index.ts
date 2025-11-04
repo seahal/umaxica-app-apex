@@ -3,8 +3,8 @@ import { Hono } from "hono";
 const SITE_URL = "umaxica.app";
 
 const allowedUrls = {
-	"jp": `https://jp.${SITE_URL}/`,
-	"us": `https://us.${SITE_URL}/`,
+	jp: `https://jp.${SITE_URL}/`,
+	us: `https://us.${SITE_URL}/`,
 } as const;
 
 type AllowedRegion = keyof typeof allowedUrls;
