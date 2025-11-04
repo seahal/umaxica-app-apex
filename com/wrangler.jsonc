@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "umaxica-app-apex-staging-org",
+	"name": "umaxica-app-apex-staging-com",
 	"main": "src/index.ts",
 	"assets": {
 		"binding": "ASSETS",
