@@ -29,6 +29,13 @@ services:
       - '5171'
       - '5172'
       - '5173'
+      - '8787'
+    ports:
+      - '5170:5170'
+      - '5171:5171'
+      - '5172:5172'
+      - '5173:5173'
+      - '8787:8787'
     command: sleep infinity
     tty: true
     stdin_open: true

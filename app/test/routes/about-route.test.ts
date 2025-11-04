@@ -1,0 +1,29 @@
+import { describe, expect, it } from "bun:test";
+import { requestFromApp } from "../utils/request";
+
+describe("GET /about", () => {
+	it("returns the about HTML document with key metadata", async () => {
+		const response = await requestFromApp("/about");
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get("content-type")).toContain("text/html");
+
+		const body = await response.text();
+
+		expect(body).toContain("<title>About - APP</title>");
+		expect(body).toContain("<h1>About APP Service</h1>");
+		expect(body).toContain("Umaxica App Status Page - APP Service");
+	});
+
+	it("applies security headers to the about page", async () => {
+		const response = await requestFromApp("/about");
+
+		expect(response.headers.get("permissions-policy")).toContain(
+			"camera=()",
+		);
+		expect(response.headers.get("content-security-policy")).toContain(
+			"default-src 'self'",
+		);
+		expect(response.headers.get("x-frame-options")).toBe("DENY");
+	});
+});
