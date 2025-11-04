@@ -1,5 +1,16 @@
 import { Hono } from "hono";
 
+const SITE_URL = "umaxica.org";
+
+const allowedUrls = {
+	"jp": `https://jp.${SITE_URL}/`,
+	"us": `https://us.${SITE_URL}/`,
+} as const;
+
+type AllowedRegion = keyof typeof allowedUrls;
+
+const DEFAULT_REGION: AllowedRegion = "jp";
+
 type AssetEnv = {
 	ASSETS?: {
 		fetch: (request: Request) => Promise<Response>;
@@ -30,7 +41,25 @@ app.use("*", async (c, next) => {
 });
 
 app.get("/", (c) => {
-	return c.text("Hello 2 Hono! org");
+	const region: string = c.req.query("ri")?.toLowerCase() ?? "";
+
+	const redirectUrl = allowedUrls[region as AllowedRegion];
+	if (redirectUrl) {
+		return c.redirect(redirectUrl, 302);
+	}
+
+	const defaultRedirectUrl = allowedUrls[DEFAULT_REGION];
+	if (defaultRedirectUrl) {
+		return c.redirect(defaultRedirectUrl, 302);
+	}
+
+	return c.json(
+		{
+			error: "region_not_supported",
+			message: "Unable to determine a safe redirect target",
+		},
+		500,
+	);
 });
 
 app.get("/health", (c) => {

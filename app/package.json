@@ -2,7 +2,7 @@
 	"name": "umaxica-app-apex-staging-app",
 	"type": "module",
 	"scripts": {
-		"server": "wrangler dev --ip 0.0.0.0 --port 8787",
+		"server": "wrangler dev --ip 0.0.0.0 --port 8781",
 		"deploy": "wrangler deploy --minify",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
 	},
