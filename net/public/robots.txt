@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 User-agent: *
@@ -8,3 +9,6 @@ Allow: /
 =======
 
 >>>>>>> faea5ce (Update robots.txt)
+=======
+
+>>>>>>> main
