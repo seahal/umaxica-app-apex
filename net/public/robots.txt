@@ -1,6 +1,10 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 User-agent: *
 Allow: /
 >>>>>>> 8f9290a (Update robots.txt)
+=======
+
+>>>>>>> faea5ce (Update robots.txt)
