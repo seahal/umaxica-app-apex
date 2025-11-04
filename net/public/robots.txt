@@ -1,1 +1,6 @@
+<<<<<<< HEAD
 
+=======
+User-agent: *
+Allow: /
+>>>>>>> 8f9290a (Update robots.txt)
