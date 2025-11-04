@@ -24,4 +24,26 @@ describe("GET /about", () => {
 		);
 		expect(response.headers.get("x-frame-options")).toBe("DENY");
 	});
+
+	it("includes all required security headers", async () => {
+		const response = await requestFromApp("/about");
+
+		expect(response.headers.get("strict-transport-security")).toContain(
+			"max-age=31536000",
+		);
+		expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+		expect(response.headers.get("referrer-policy")).toBe("no-referrer");
+		expect(response.headers.get("x-xss-protection")).toBe("1; mode=block");
+	});
+
+	it("returns valid HTML structure", async () => {
+		const response = await requestFromApp("/about");
+		const body = await response.text();
+
+		expect(body).toContain("<!DOCTYPE html>");
+		expect(body).toContain("<html");
+		expect(body).toContain("</html>");
+		expect(body).toContain("<head>");
+		expect(body).toContain("<body>");
+	});
 });

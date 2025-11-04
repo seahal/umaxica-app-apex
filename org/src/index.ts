@@ -1,15 +1,11 @@
 import { Hono } from "hono";
-
-const SITE_URL = "umaxica.org";
-
-const allowedUrls = {
-	jp: `https://jp.${SITE_URL}/`,
-	us: `https://us.${SITE_URL}/`,
-} as const;
-
-type AllowedRegion = keyof typeof allowedUrls;
-
-const DEFAULT_REGION: AllowedRegion = "jp";
+import { renderAboutPage } from "./pages/about-page";
+import { renderHealthPage } from "./pages/health-page";
+import {
+	buildRegionErrorPayload,
+	getDefaultRedirectUrl,
+	resolveRedirectUrl,
+} from "./pages/root-redirect";
 
 type AssetEnv = {
 	ASSETS?: {
@@ -41,64 +37,27 @@ app.use("*", async (c, next) => {
 });
 
 app.get("/", (c) => {
-	const region: string = c.req.query("ri")?.toLowerCase() ?? "";
+	const regionParam = c.req.query("ri");
 
-	const redirectUrl = allowedUrls[region as AllowedRegion];
+	const redirectUrl = resolveRedirectUrl(regionParam);
 	if (redirectUrl) {
 		return c.redirect(redirectUrl, 302);
 	}
 
-	const defaultRedirectUrl = allowedUrls[DEFAULT_REGION];
+	const defaultRedirectUrl = getDefaultRedirectUrl();
 	if (defaultRedirectUrl) {
 		return c.redirect(defaultRedirectUrl, 302);
 	}
 
-	return c.json(
-		{
-			error: "region_not_supported",
-			message: "Unable to determine a safe redirect target",
-		},
-		500,
-	);
+	return c.json(buildRegionErrorPayload(), 500);
 });
 
 app.get("/health", (c) => {
-	return c.html(`<!DOCTYPE html>
-<html lang="ja">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Health Check - ORG</title>
-</head>
-<body>
-	<h1>Health Check</h1>
-	<p>✓ OK</p>
-	<p><strong>Service:</strong> ORG</p>
-	<p><strong>Status:</strong> Running</p>
-	<p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
-</body>
-</html>`);
+	return c.html(renderHealthPage(new Date().toISOString()));
 });
 
 app.get("/about", (c) => {
-	return c.html(`<!DOCTYPE html>
-<html lang="ja">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>About - ORG</title>
-</head>
-<body>
-	<h1>About ORG Service</h1>
-	<h2>Service Information</h2>
-	<p><strong>Service Name:</strong> ORG</p>
-	<p><strong>Description:</strong> Umaxica App Status Page - ORG Service</p>
-	<p><strong>Framework:</strong> Hono</p>
-	<p><strong>Runtime:</strong> Cloudflare Workers</p>
-	<h2>Contact</h2>
-	<p>For more information, please visit our main page.</p>
-</body>
-</html>`);
+	return c.html(renderAboutPage());
 });
 
 app.get("/v1/health", (c) => {

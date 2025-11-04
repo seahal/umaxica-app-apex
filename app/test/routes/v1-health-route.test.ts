@@ -21,4 +21,32 @@ describe("GET /v1/health", () => {
 		);
 		expect(response.headers.get("referrer-policy")).toBe("no-referrer");
 	});
+
+	it("includes all security headers for API endpoint", async () => {
+		const response = await requestFromApp("/v1/health");
+
+		expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+		expect(response.headers.get("x-frame-options")).toBe("DENY");
+		expect(response.headers.get("x-xss-protection")).toBe("1; mode=block");
+		expect(response.headers.get("content-security-policy")).toContain(
+			"default-src 'self'",
+		);
+	});
+
+	it("returns a valid JSON object with correct structure", async () => {
+		const response = await requestFromApp("/v1/health");
+		const payload = await response.json();
+
+		expect(typeof payload).toBe("object");
+		expect(payload).toHaveProperty("status");
+		expect(typeof payload.status).toBe("string");
+	});
+
+	it("does not include extra fields in response", async () => {
+		const response = await requestFromApp("/v1/health");
+		const payload = await response.json();
+
+		const keys = Object.keys(payload);
+		expect(keys).toEqual(["status"]);
+	});
 });

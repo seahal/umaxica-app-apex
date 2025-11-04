@@ -1,21 +1,22 @@
 import { describe, expect, it } from "bun:test";
-import { requestFromNetApp } from "./utils/request";
+import { requestFromDevApp } from "./utils/request";
 
-describe("GET /", () => {
-	it("returns the NET welcome HTML document", async () => {
-		const response = await requestFromNetApp("/");
+describe("GET /health", () => {
+	it("returns the DEV health HTML document", async () => {
+		const response = await requestFromDevApp("/health");
 
 		expect(response.status).toBe(200);
 		expect(response.headers.get("content-type")).toContain("text/html");
 
 		const body = await response.text();
-		expect(body).toContain("<title>Welcome - NET</title>");
-		expect(body).toContain("<h1>Umaxica NET Workspace</h1>");
-		expect(body).toContain("Hello 2 Hono! net");
+		expect(body).toContain("<title>Health Check - DEV</title>");
+		expect(body).toContain("<strong>Service:</strong> DEV");
+		expect(body).toContain("<strong>Status:</strong> Running");
+		expect(body).toContain("<strong>Timestamp:</strong>");
 	});
 
-	it("applies security headers to the root response", async () => {
-		const response = await requestFromNetApp("/");
+	it("applies security headers to the health response", async () => {
+		const response = await requestFromDevApp("/health");
 
 		expect(response.headers.get("strict-transport-security")).toContain(
 			"max-age=31536000",

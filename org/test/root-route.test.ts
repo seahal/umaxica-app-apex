@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { requestFromOrgApp } from "./utils/request";
+import { buildRegionErrorPayload } from "../src/pages/root-redirect";
 
 const SITE_URL = "umaxica.org";
 const DEFAULT_REGION = "jp";
@@ -142,6 +143,13 @@ describe("GET /", () => {
 
 			expect(response.status).toBe(302);
 			expect(response.headers.get("location")).toBe(`https://us.${SITE_URL}/`);
+		});
+	});
+
+	it("exposes a stable error payload for unsupported regions", () => {
+		expect(buildRegionErrorPayload()).toEqual({
+			error: "region_not_supported",
+			message: "Unable to determine a safe redirect target",
 		});
 	});
 });

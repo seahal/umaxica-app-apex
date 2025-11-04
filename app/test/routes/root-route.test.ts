@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { requestFromApp } from "../utils/request";
+import { buildRegionErrorPayload } from "../../src/pages/root-redirect";
 
 const SITE_URL = "umaxica.app";
 const DEFAULT_REGION = "jp";
@@ -144,6 +145,48 @@ describe("GET /", () => {
 
 			expect(response.status).toBe(302);
 			expect(response.headers.get("location")).toBe(`https://us.${SITE_URL}/`);
+		});
+	});
+
+	it("exposes a stable error payload for unsupported regions", () => {
+		expect(buildRegionErrorPayload()).toEqual({
+			error: "region_not_supported",
+			message: "Unable to determine a safe redirect target",
+		});
+	});
+
+	describe("Additional Edge Cases", () => {
+		it("handles very long query strings gracefully", async () => {
+			const longValue = "a".repeat(1000);
+			const response = await requestFromApp(`/?ri=${longValue}`);
+
+			expect(response.status).toBe(302);
+			expect(response.headers.get("location")).toBe(DEFAULT_REGION_URL);
+		});
+
+		it("handles special Unicode characters in region parameter", async () => {
+			const response = await requestFromApp("/?ri=日本");
+
+			expect(response.status).toBe(302);
+			expect(response.headers.get("location")).toBe(DEFAULT_REGION_URL);
+		});
+
+		it("handles null bytes in region parameter", async () => {
+			const response = await requestFromApp("/?ri=jp%00evil");
+
+			expect(response.status).toBe(302);
+			expect(response.headers.get("location")).toBe(DEFAULT_REGION_URL);
+		});
+
+		it("applies HSTS header with includeSubDomains", async () => {
+			const response = await requestFromApp("/");
+
+			expect(response.headers.get("strict-transport-security")).toContain(
+				"includeSubDomains",
+			);
+			expect(response.headers.get("strict-transport-security")).toContain(
+				"preload",
+			);
 		});
 	});
 });
