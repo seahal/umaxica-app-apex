@@ -1,4 +1,7 @@
 import { Hono } from "hono";
+import { renderAboutPage } from "./pages/about";
+import { renderHealthPage } from "./pages/health";
+import { renderRootPage } from "./pages/root";
 
 type AssetEnv = {
 	ASSETS?: {
@@ -30,46 +33,15 @@ app.use("*", async (c, next) => {
 });
 
 app.get("/", (c) => {
-	return c.text("Hello 2 Hono! net");
+	return c.html(renderRootPage());
 });
 
 app.get("/health", (c) => {
-	return c.html(`<!DOCTYPE html>
-<html lang="ja">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Health Check - NET</title>
-</head>
-<body>
-	<h1>Health Check</h1>
-	<p>✓ OK</p>
-	<p><strong>Service:</strong> NET</p>
-	<p><strong>Status:</strong> Running</p>
-	<p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
-</body>
-</html>`);
+	return c.html(renderHealthPage(new Date().toISOString()));
 });
 
 app.get("/about", (c) => {
-	return c.html(`<!DOCTYPE html>
-<html lang="ja">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>About - NET</title>
-</head>
-<body>
-	<h1>About NET Service</h1>
-	<h2>Service Information</h2>
-	<p><strong>Service Name:</strong> NET</p>
-	<p><strong>Description:</strong> Umaxica App Status Page - NET Service</p>
-	<p><strong>Framework:</strong> Hono</p>
-	<p><strong>Runtime:</strong> Cloudflare Workers</p>
-	<h2>Contact</h2>
-	<p>For more information, please visit our main page.</p>
-</body>
-</html>`);
+	return c.html(renderAboutPage());
 });
 
 app.get("/v1/health", (c) => {

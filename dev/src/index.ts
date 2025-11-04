@@ -1,5 +1,16 @@
 import { Hono } from "hono";
 
+const SITE_URL = "umaxica.dev";
+
+const allowedUrls = {
+	jp: `https://jp.${SITE_URL}/`,
+	us: `https://us.${SITE_URL}/`,
+} as const;
+
+type AllowedRegion = keyof typeof allowedUrls;
+
+const DEFAULT_REGION: AllowedRegion = "jp";
+
 type AssetEnv = {
 	ASSETS?: {
 		fetch: (request: Request) => Promise<Response>;
@@ -29,13 +40,26 @@ app.use("*", async (c, next) => {
 	c.header("X-XSS-Protection", "1; mode=block");
 });
 
-const welcomeStrings = [
-	"Hello Hono!",
-	"2 Vercel, visit https://vercel.com/docs/frameworks/backend/hono",
-];
-
 app.get("/", (c) => {
-	return c.text(welcomeStrings.join("\n\n"));
+	const region: string = c.req.query("ri")?.toLowerCase() ?? "";
+
+	const redirectUrl = allowedUrls[region as AllowedRegion];
+	if (redirectUrl) {
+		return c.redirect(redirectUrl, 302);
+	}
+
+	const defaultRedirectUrl = allowedUrls[DEFAULT_REGION];
+	if (defaultRedirectUrl) {
+		return c.redirect(defaultRedirectUrl, 302);
+	}
+
+	return c.json(
+		{
+			error: "region_not_supported",
+			message: "Unable to determine a safe redirect target",
+		},
+		500,
+	);
 });
 
 app.get("/health", (c) => {
@@ -70,7 +94,7 @@ app.get("/about", (c) => {
 	<p><strong>Service Name:</strong> DEV</p>
 	<p><strong>Description:</strong> Umaxica App Status Page - DEV Service</p>
 	<p><strong>Framework:</strong> Hono</p>
-	<p><strong>Runtime:</strong> Cloudflare Workers</p>
+	<p><strong>Runtime:</strong> Vercel Edge Functions</p>
 	<h2>Contact</h2>
 	<p>For more information, please visit our main page.</p>
 </body>
