@@ -2,6 +2,8 @@
 	"buildCommand": "cd .. && bun install && cd dev && bun build src/index.ts --outdir=dist --target=node",
 	"devCommand": "bun run server",
 	"installCommand": "cd .. && bun install",
-	"framework": null,
-	"outputDirectory": "dist"
+	"framework": "hono",
+	"outputDirectory": "dist",
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"bunVersion": "1.x"
 }
