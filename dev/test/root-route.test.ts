@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { requestFromDevApp } from "./utils/request";
 import { buildRegionErrorPayload } from "../src/pages/root-redirect";
+import { requestFromDevApp } from "./utils/request";
 
 const SITE_URL = "umaxica.dev";
 const DEFAULT_REGION = "jp";
