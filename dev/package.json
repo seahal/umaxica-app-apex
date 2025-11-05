@@ -1,10 +1,4 @@
 {
-	"name": "umaxica-app-apex-dev",
-	"type": "module",
-	"private": true,
-	"scripts": {
-		"server": "bun --ip 0.0.0.0 --port 8785",
-		"build": "bun build src/index.ts --outdir=dist --target=node",
-		"dev": "bun run server"
-	}
+	"name": "umaxica-app-apex-staging-dev",
+	"type": "module"
 }
