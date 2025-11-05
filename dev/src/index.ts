@@ -3,7 +3,7 @@ import { Hono } from "hono";
 const app = new Hono();
 
 const welcomeStrings = [
-  `Hello Hono from Bun ${process.versions.bun}!`,
+  `Hello Hono on vercel from Bun ${process.versions.bun}!`,
   "To learn more about Hono + Bun on Vercel, visit https://vercel.com/docs/frameworks/backend/hono",
 ];
 
