@@ -1,3 +1,9 @@
-h1 {
-  font-family: Arial, Helvetica, sans-serif;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  a {
+    @apply text-blue-600 underline;
+  }
 }

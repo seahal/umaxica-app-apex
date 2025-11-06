@@ -11,7 +11,13 @@
       "Bash(bun run preview:*)",
       "Bash(vite preview:*)",
       "Bash(wrangler dev)",
-      "Bash(bunx wrangler:*)"
+      "Bash(bunx wrangler:*)",
+      "Bash(pkill:*)",
+      "Bash(bun run dev)",
+      "Bash(lsof:*)",
+      "Bash(xargs:*)",
+      "Bash(kill:*)",
+      "Bash(killall:*)"
     ],
     "deny": [],
     "ask": []
