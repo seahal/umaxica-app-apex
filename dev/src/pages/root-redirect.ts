@@ -1,4 +1,4 @@
-const SITE_URL = "umaxica.app";
+const SITE_URL = "umaxica.dev";
 
 const allowedUrls = {
 	jp: `https://jp.${SITE_URL}/`,
