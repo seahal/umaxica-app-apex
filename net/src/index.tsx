@@ -3,7 +3,7 @@ import { renderer } from './renderer'
 
 const app = new Hono()
 
-app.use(renderer)
+
 
 app.use("*", async (c, next) => {
 	await next();
@@ -25,6 +25,18 @@ app.use("*", async (c, next) => {
 	c.header("X-XSS-Protection", "1; mode=block");
 });
 
+app.get('/health', (c) => {
+  const timestampIso = new Date().toISOString()
+  return c.render(
+    <div class="space-y-4">
+      <p>✓ OK</p>
+      <p><strong>Timestamp:</strong> {timestampIso}</p>
+    </div>
+  )
+})
+
+app.use(renderer)
+
 app.get('/', (c) => {
   return c.render(
     <>
@@ -38,5 +50,17 @@ app.get('/', (c) => {
     <hr/></>
   )
 })
+
+
+app.get('/about', (c) => {
+  return c.render(
+    <>
+    <hr />
+    <h2>Contact</h2>
+    <p>For more information, please visit our main page.</p>
+    <hr />
+    </>
+  )
+})  
 
 export default app
