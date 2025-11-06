@@ -4,14 +4,14 @@
     "": {
       "name": "umaxica-app-apex",
       "dependencies": {
-        "hono": "latest",
+        "hono": "^4.10.4",
       },
       "devDependencies": {
-        "@biomejs/biome": "latest",
-        "@types/bun": "latest",
-        "@typescript/native-preview": "latest",
-        "bun-types": "latest",
-        "wrangler": "latest",
+        "@biomejs/biome": "2.3.4",
+        "@types/bun": "^1.3.1",
+        "@typescript/native-preview": "^7.0.0-dev.20251106.1",
+        "bun-types": "^1.3.1",
+        "wrangler": "^4.46.0",
       },
     },
     "app": {
@@ -24,10 +24,7 @@
       "name": "apex-staging-dev",
     },
     "net": {
-      "name": "my-app",
-      "dependencies": {
-        "hono": "^4.10.4",
-      },
+      "name": "umaxica-app-apex-net",
       "devDependencies": {
         "@cloudflare/vite-plugin": "^1.2.3",
         "autoprefixer": "^10.4.20",
@@ -441,8 +438,6 @@
 
     "ms": ["ms@2.1.3", "", {}, "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA=="],
 
-    "my-app": ["my-app@workspace:net"],
-
     "mz": ["mz@2.7.0", "", { "dependencies": { "any-promise": "^1.0.0", "object-assign": "^4.0.1", "thenify-all": "^1.0.0" } }, "sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q=="],
 
     "nanoid": ["nanoid@3.3.11", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w=="],
@@ -548,6 +543,8 @@
     "ts-interface-checker": ["ts-interface-checker@0.1.13", "", {}, "sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA=="],
 
     "tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
+
+    "umaxica-app-apex-net": ["umaxica-app-apex-net@workspace:net"],
 
     "umaxica-app-apex-staging-app": ["umaxica-app-apex-staging-app@workspace:app"],
 
