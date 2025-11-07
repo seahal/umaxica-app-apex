@@ -15,7 +15,7 @@
 		"bun-types": "^1.3.1",
 		"wrangler": "^4.46.0",
 		"@types/bun": "^1.3.1",
-		"@typescript/native-preview": "^7.0.0-dev.20251106.1"
+		"@typescript/native-preview": "^7.0.0-dev.20251107.1"
 	},
 	"private": true,
 	"workspaces": [
