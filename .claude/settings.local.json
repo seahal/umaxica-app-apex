@@ -1,25 +1,25 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(cat:*)",
-      "Bash(bun test:*)",
-      "Bash(bun install)",
-      "Bash(docker compose run:*)",
-      "WebFetch(domain:www.npmjs.com)",
-      "Bash(bun run server)",
-      "Bash(bun run build:*)",
-      "Bash(bun run preview:*)",
-      "Bash(vite preview:*)",
-      "Bash(wrangler dev)",
-      "Bash(bunx wrangler:*)",
-      "Bash(pkill:*)",
-      "Bash(bun run dev)",
-      "Bash(lsof:*)",
-      "Bash(xargs:*)",
-      "Bash(kill:*)",
-      "Bash(killall:*)"
-    ],
-    "deny": [],
-    "ask": []
-  }
+	"permissions": {
+		"allow": [
+			"Bash(cat:*)",
+			"Bash(bun test:*)",
+			"Bash(bun install)",
+			"Bash(docker compose run:*)",
+			"WebFetch(domain:www.npmjs.com)",
+			"Bash(bun run server)",
+			"Bash(bun run build:*)",
+			"Bash(bun run preview:*)",
+			"Bash(vite preview:*)",
+			"Bash(wrangler dev)",
+			"Bash(bunx wrangler:*)",
+			"Bash(pkill:*)",
+			"Bash(bun run dev)",
+			"Bash(lsof:*)",
+			"Bash(xargs:*)",
+			"Bash(kill:*)",
+			"Bash(killall:*)"
+		],
+		"deny": [],
+		"ask": []
+	}
 }

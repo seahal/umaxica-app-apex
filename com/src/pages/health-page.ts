@@ -6,10 +6,7 @@ export const renderHealthPage = (timestampIso: string) => `<!DOCTYPE html>
 	<title>Health Check - COM</title>
 </head>
 <body>
-	<h1>Health Check</h1>
 	<p>✓ OK</p>
-	<p><strong>Service:</strong> COM</p>
-	<p><strong>Status:</strong> Running</p>
 	<p><strong>Timestamp:</strong> ${timestampIso}</p>
 </body>
 </html>`;
