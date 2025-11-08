@@ -6,6 +6,10 @@ import {
 	getDefaultRedirectUrl,
 	resolveRedirectUrl,
 } from "./pages/root-redirect";
+import {
+	createSentryMiddleware,
+	type SentryEnv,
+} from "./observability/sentry";
 
 type AssetEnv = {
 	ASSETS?: {
@@ -13,7 +17,11 @@ type AssetEnv = {
 	};
 };
 
-const app = new Hono<{ Bindings: AssetEnv }>();
+type AppBindings = AssetEnv & SentryEnv;
+
+const app = new Hono<{ Bindings: AppBindings }>();
+
+app.use("*", createSentryMiddleware<AppBindings>());
 
 // Security headers middleware
 app.use("*", async (c, next) => {
