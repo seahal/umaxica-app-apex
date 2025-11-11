@@ -13,11 +13,9 @@ type AssetEnv = {
 	};
 };
 
-type AppBindings = AssetEnv & SentryEnv;
+type AppBindings = AssetEnv;
 
 const app = new Hono<{ Bindings: AppBindings }>();
-
-app.use("*", createSentryMiddleware<AppBindings>());
 
 // Security headers middleware
 app.use("*", async (c, next) => {
