@@ -6,10 +6,6 @@ import {
 	getDefaultRedirectUrl,
 	resolveRedirectUrl,
 } from "./pages/root-redirect";
-import {
-	createSentryMiddleware,
-	type SentryEnv,
-} from "./observability/sentry";
 
 type AssetEnv = {
 	ASSETS?: {
