@@ -9,12 +9,17 @@
 
 Each document is intended to evolve with the implementation; update both the corresponding doc and this README section whenever requirements, design decisions, or testing obligations change.
 
-## tools
-- Sentry ... ?
+## 
 - Vercel
+  - Domain
+  - (?)
 - Cloudflare
+  - Workers
+  - Domains
+  - DNS
 - Github
-
+- AWS
+  - CloudWatch
 
 ## Known Issues & Limitations
 - This is a work in progress.

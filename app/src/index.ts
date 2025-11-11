@@ -13,7 +13,9 @@ type AssetEnv = {
 	};
 };
 
-const app = new Hono<{ Bindings: AssetEnv }>();
+type AppBindings = AssetEnv;
+
+const app = new Hono<{ Bindings: AppBindings }>();
 
 // Security headers middleware
 app.use("*", async (c, next) => {

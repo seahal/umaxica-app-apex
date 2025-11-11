@@ -11,14 +11,14 @@
 	//   "nodejs_compat"
 	// ],
 	"vars": {
-		"MY_VAR": "my-variable"
+		"": "my-variable"
 	},
-	// "kv_namespaces": [
-	//   {
-	//     "binding": "MY_KV_NAMESPACE",
-	//     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-	//   }
-	// ],
+	"kv_namespaces": [
+		{
+			"binding": "MY_KV_NAMESPACE",
+			"id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+		}
+	],
 	// "r2_buckets": [
 	//   {
 	//     "binding": "MY_BUCKET",
