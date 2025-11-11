@@ -9,7 +9,7 @@
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.2.3",
+    "@cloudflare/vite-plugin": "^1.14.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^4.1.17",
